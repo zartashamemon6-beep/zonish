@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZONISH COMPUTER ACADEMY NEWJAOTI - Online Portal</title>
+    <meta name="description"
+        content="Online Student Attendance and Fee Tracking System for ZONISH COMPUTER ACADEMY NEWJAOTI">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar / Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-laptop-code"></i>
+                </div>
+                <div class="brand-info">
+                    <h2 style="font-size: 1.15rem; line-height: 1.25; font-weight: 800; letter-spacing: 0.05em;">
+                        ZONISH<br><span
+                            style="font-size: 0.82rem; font-weight: 600; text-transform: none; display: block; opacity: 0.92; margin-top: 2px;">Computer
+                            Academy Newjatoi</span></h2>
+                    <span class="badge badge-online" style="margin-top: 4px;"><i class="fa-solid fa-wifi"></i> Online
+                        Portal</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="attendance" id="nav-attendance">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Attendance Register</span>
+                </button>
+                <button class="nav-item" data-tab="students" id="nav-students">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students List</span>
+                </button>
+                <button class="nav-item" data-tab="fees" id="nav-fees">
+                    <span class="pkr-icon">PKR</span>
+                    <span>Fee Tracker</span>
+                </button>
+                <button class="nav-item" data-tab="admin" id="nav-admin">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span>Admin Panel</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sync-status-card" id="sync-indicator">
+                    <i class="fa-solid fa-hard-drive"></i>
+                    <div class="sync-text">
+                        <span class="sync-title" id="sync-mode-title">Local Storage</span>
+                        <span class="sync-desc" id="sync-mode-desc">Click Cloud & Sync to connect</span>
+                    </div>
+                </div>
+                <button class="theme-toggle" id="theme-toggle-btn" title="Toggle Light/Dark Theme">
+                    <i class="fa-solid fa-sun" id="theme-icon"></i>
+                    <span id="theme-text">Light Mode</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <button class="menu-toggle" id="mobile-menu-toggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="page-title">
+                    <h1 id="current-page-title">Dashboard</h1>
+                    <p id="current-page-subtitle">Welcome back! Real-time academy overview from anywhere.</p>
+                </div>
+                <div class="topbar-actions">
+                    <div class="date-badge">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        <span id="header-today-date">Loading...</span>
+                    </div>
+                    <button class="btn btn-success btn-sm" id="quick-collect-fee-btn">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                        <span>Collect Fee</span>
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="quick-add-student-btn">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Add Student</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- TAB 1: DASHBOARD -->
+            <section class="tab-content active" id="tab-dashboard">
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card gradient-blue">
+                        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="stat-details">
+                            <span class="stat-label">Total Students</span>
+                            <h2 class="stat-value" id="stat-total-students">0</h2>
+                            <span class="stat-meta" id="stat-active-courses">0 Active Courses</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card gradient-green">
+                        <div class="stat-icon"><i class="fa-solid fa-clipboard-user"></i></div>
+                        <div class="stat-details">
+                            <span class="stat-label">Today's Attendance</span>
+                            <h2 class="stat-value" id="stat-today-attendance">0%</h2>
+                            <span class="stat-meta" id="stat-today-present-count">0 Present Today</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card gradient-purple">
+                        <div class="stat-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+                        <div class="stat-details">
+                            <span class="stat-label">Monthly Fees Collected</span>
+                            <h2 class="stat-value" id="stat-fees-paid-count">Rs. 0</h2>
+                            <span class="stat-meta" id="stat-fees-paid-percent">0 Students Paid</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card gradient-amber">
+                        <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="stat-details">
+                            <span class="stat-label">Fees Overdue / Due</span>
+                            <h2 class="stat-value" id="stat-fees-due-count">0</h2>
+                            <span class="stat-meta text-warning">Requires Attention</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Quick Action Grid -->
+                <div class="dashboard-grid">
+                    <!-- Recent Attendance Status -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-clock-rotate-left"></i> Today's Attendance Overview</h3>
+                            <button class="btn btn-secondary btn-xs" onclick="switchTab('attendance')">Open
+                                Register</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-labels">
+                                    <span>Present vs Total Enrolled</span>
+                                    <span id="dash-attendance-ratio">0/0</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div class="progress-fill" id="dash-attendance-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="mini-student-list" id="dash-recent-attendance-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fees Status Summary -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-clock"></i> Fee Due Alerts</h3>
+                            <button class="btn btn-secondary btn-xs" onclick="switchTab('fees')">View Fee
+                                Tracker</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="fee-alerts-list" id="dash-fee-alerts-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: ATTENDANCE REGISTER -->
+            <section class="tab-content" id="tab-attendance">
+                <div class="content-card">
+                    <div class="card-header flex-wrap gap-15">
+                        <div class="attendance-filter-group">
+                            <label for="attendance-date-picker"><i class="fa-solid fa-calendar-days"></i> Select
+                                Date:</label>
+                            <input type="date" id="attendance-date-picker" class="form-input form-input-sm">
+                        </div>
+                        <div class="attendance-filter-group">
+                            <label for="attendance-course-filter"><i class="fa-solid fa-book"></i> Filter Class:</label>
+                            <select id="attendance-course-filter" class="form-input form-input-sm">
+                                <option value="ALL">All Classes / Courses</option>
+                            </select>
+                        </div>
+                        <div class="attendance-actions">
+                            <button class="btn btn-secondary btn-sm" id="btn-mark-all-present">
+                                <i class="fa-solid fa-check-double"></i> Mark All Present
+                            </button>
+                            <button class="btn btn-primary btn-sm" id="btn-save-attendance">
+                                <i class="fa-solid fa-floppy-disk"></i> Save Attendance Log
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Student Name</th>
+                                        <th>Father's Name (F/Name)</th>
+                                        <th>Class / Course</th>
+                                        <th>Fee Status</th>
+                                        <th class="text-center">Attendance Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: STUDENTS DIRECTORY -->
+            <section class="tab-content" id="tab-students">
+                <div class="content-card mb-20">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-user-plus"></i> Register New Student</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="add-student-form" class="form-grid">
+                            <div class="form-group">
+                                <label for="input-name">Student Name <span class="required">*</span></label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-user"></i>
+                                    <input type="text" id="input-name" class="form-input" placeholder="e.g. Shahnawaz"
+                                        required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="input-fname">Father's Name (F/Name) <span class="required">*</span></label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-user-group"></i>
+                                    <input type="text" id="input-fname" class="form-input" placeholder="e.g. Ahmed Khan"
+                                        required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="input-class">Class / Course <span class="required">*</span></label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                    <select id="input-class" class="form-input" required>
+                                        <option value="">-- Select Course --</option>
+                                        <option value="DIT (One Year Diploma)">DIT (One Year Diploma)</option>
+                                        <option value="MS Office & Typing">MS Office & Typing</option>
+                                        <option value="Graphic Design & Video">Graphic Design & Video</option>
+                                        <option value="Web Design & HTML/CSS">Web Design & HTML/CSS</option>
+                                        <option value="Python Programming">Python Programming</option>
+                                        <option value="Hardware & Networking">Hardware & Networking</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Fee Payment Type <span class="required">*</span></label>
+                                <div class="radio-toggle-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="input-feetype" value="Monthly Fees" checked>
+                                        <span class="radio-tile">
+                                            <i class="fa-solid fa-calendar-days"></i> Monthly Fees
+                                        </span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="input-feetype" value="Advance Fees">
+                                        <span class="radio-tile">
+                                            <i class="fa-solid fa-bolt"></i> Advance Fees
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="input-feeamount">Fee Amount (PKR) <span class="required">*</span></label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-money-bill-wave"></i>
+                                    <input type="number" id="input-feeamount" class="form-input" value="1000"
+                                        placeholder="Monthly Fee e.g. 1000" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="input-feedate">Date of Fees Paid <span class="required">*</span></label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                    <input type="date" id="input-feedate" class="form-input" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="input-phone">Contact Number (Optional)</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-phone"></i>
+                                    <input type="tel" id="input-phone" class="form-input"
+                                        placeholder="e.g. 03001234567">
+                                </div>
+                            </div>
+
+                            <div class="form-group full-width-action">
+                                <button type="submit" class="btn btn-success btn-block" id="save-student-btn"
+                                    style="height: 42px;">
+                                    <i class="fa-solid fa-plus-circle"></i> Save Student Record
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Students Table Container -->
+                <div class="content-card">
+                    <div class="card-header flex-wrap gap-15">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="search-student-input" class="form-input"
+                                placeholder="Search by name, father name or class...">
+                        </div>
+                        <div class="attendance-filter-group">
+                            <select id="filter-course-dropdown" class="form-input form-input-sm">
+                                <option value="ALL">All Courses</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Father's Name (F/Name)</th>
+                                        <th>Class / Course</th>
+                                        <th>Monthly Fees / Advance</th>
+                                        <th>Date of Fees Paid</th>
+                                        <th>Fee Status</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: FEE TRACKER & MONTHLY RECORDS -->
+            <section class="tab-content" id="tab-fees">
+                <div class="content-card mb-20">
+                    <div class="card-header flex-wrap gap-15">
+                        <h3><span class="pkr-icon">PKR</span> Monthly Fee Collection Record</h3>
+                        <div class="attendance-filter-group">
+                            <label for="fee-month-filter"><i class="fa-solid fa-calendar-check"></i> Select
+                                Month:</label>
+                            <select id="fee-month-filter" class="form-input form-input-sm">
+                                <!-- Populated dynamically (e.g. August 2026, July 2026) -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="fee-stats-wrapper">
+                            <div class="fee-mini-stat green" style="background: rgba(16, 185, 129, 0.1);">
+                                <h4>Total Collected This Month</h4>
+                                <p id="fee-stat-total-amount" style="color: var(--color-success);">Rs. 0</p>
+                            </div>
+                            <div class="fee-mini-stat green">
+                                <h4>Students Paid</h4>
+                                <p id="fee-stat-paid">0 Students</p>
+                            </div>
+                            <div class="fee-mini-stat amber">
+                                <h4>Due Soon (&lt; 7 Days)</h4>
+                                <p id="fee-stat-duesoon">0 Students</p>
+                            </div>
+                            <div class="fee-mini-stat red">
+                                <h4>Overdue (&gt; 30 Days)</h4>
+                                <p id="fee-stat-overdue">0 Students</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3><span class="pkr-icon">PKR</span> Student Fee Collection Ledger</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Father's Name (F/Name)</th>
+                                        <th>Class / Course</th>
+                                        <th>Monthly Fees / Advance</th>
+                                        <th>Last Payment Date</th>
+                                        <th>Status</th>
+                                        <th class="text-right">Quick Payment Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fees-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: ADMIN PANEL (PASSWORD PROTECTED) -->
+            <section class="tab-content" id="tab-admin">
+                <!-- Lock Screen (Shown when locked) -->
+                <div id="admin-lock-screen" class="content-card" style="max-width: 480px; margin: 40px auto;">
+                    <div class="card-header text-center"
+                        style="justify-content: center; flex-direction: column; gap: 8px;">
+                        <div class="brand-logo" style="margin: 0 auto; width: 56px; height: 56px; font-size: 24px;">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h3>Admin Security Check</h3>
+                        <p class="text-muted" style="font-size: 0.85rem;">Enter password to access Admin Control Center.
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <form id="admin-login-form" class="form-stack">
+                            <div class="form-group">
+                                <label for="admin-password-input">Admin Password</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-key"></i>
+                                    <input type="password" id="admin-password-input" class="form-input"
+                                        placeholder="Enter password (default: admin123)" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fa-solid fa-unlock"></i> Unlock Admin Panel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Unlocked Content (Hidden until unlocked) -->
+                <div id="admin-unlocked-content" style="display: none;">
+                    <div class="dashboard-grid mb-20">
+                        <!-- Card 1: Admin Control Center -->
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-user-shield"></i> Admin Control Center</h3>
+                                <button class="btn btn-secondary btn-xs" id="btn-lock-admin">
+                                    <i class="fa-solid fa-lock"></i> Lock Panel
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-15">Academy controls for <strong>ZONISH COMPUTER ACADEMY
+                                        NEWJAOTI</strong>.</p>
+                                <div class="form-stack">
+                                    <div class="form-group">
+                                        <label>Academy Name</label>
+                                        <input type="text" class="form-input" value="ZONISH - Computer Academy Newjatoi"
+                                            readonly style="opacity:0.8;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Database Status</label>
+                                        <p class="text-muted"><strong id="admin-student-count">0</strong> Enrolled
+                                            Students in system.</p>
+                                    </div>
+                                    <hr style="border:0; border-top: 1px solid var(--border-color);">
+                                    <div class="form-group">
+                                        <label for="change-admin-pass">Update Admin Password</label>
+                                        <div class="flex-gap-10">
+                                            <input type="password" id="change-admin-pass" class="form-input"
+                                                placeholder="New password...">
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                id="btn-save-new-pass">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Danger Zone -->
+                        <div class="content-card" style="border: 1px solid rgba(239, 68, 68, 0.4);">
+                            <div class="card-header" style="background-color: rgba(239, 68, 68, 0.08);">
+                                <h3 style="color: var(--color-danger);"><i class="fa-solid fa-triangle-exclamation"></i>
+                                    Danger Zone</h3>
+                                <span class="badge badge-danger">Admin Action</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-15">Wipe student database or restore initial demo records.</p>
+                                <div class="form-stack">
+                                    <div class="form-group">
+                                        <label for="confirm-delete-text">To delete all students, type
+                                            <strong>DELETE</strong> below:</label>
+                                        <input type="text" id="confirm-delete-text" class="form-input"
+                                            placeholder="Type DELETE here...">
+                                    </div>
+                                    <button class="btn btn-block" id="btn-delete-all-students"
+                                        style="background-color: var(--color-danger); color: white;" disabled>
+                                        <i class="fa-solid fa-trash-can"></i> Delete All Students Database
+                                    </button>
+                                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
+                                    <button class="btn btn-outline btn-block" id="btn-reset-demo-data">
+                                        <i class="fa-solid fa-rotate-left"></i> Restore Sample Demo Students
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 (New Card): Month-Wise Payment Summary & Total Students Ledger -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3><span class="pkr-icon">PKR</span> All Months Payment Collection & Student
+                                Summary
+                            </h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Month & Year</th>
+                                            <th>Total Revenue Collected (PKR)</th>
+                                            <th>Students Paid</th>
+                                            <th>Students Unpaid</th>
+                                            <th class="text-right">Collection Rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-monthly-summary-body">
+                                        <!-- Populated dynamically (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug...) -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div class="modal" id="edit-student-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-user-pen"></i> Edit Student Record</h3>
+                <button class="close-modal-btn" id="close-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-student-form" class="form-stack">
+                    <input type="hidden" id="edit-student-id">
+                    <div class="form-group">
+                        <label for="edit-name">Student Name</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" id="edit-name" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-fname">Father's Name (F/Name)</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-user-group"></i>
+                            <input type="text" id="edit-fname" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-class">Class / Course</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <input type="text" id="edit-class" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Fee Payment Type</label>
+                        <div class="radio-toggle-group">
+                            <label class="radio-option">
+                                <input type="radio" name="edit-feetype" value="Monthly Fees" id="edit-feetype-monthly">
+                                <span class="radio-tile">
+                                    <i class="fa-solid fa-calendar-days"></i> Monthly Fees
+                                </span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="edit-feetype" value="Advance Fees" id="edit-feetype-advance">
+                                <span class="radio-tile">
+                                    <i class="fa-solid fa-bolt"></i> Advance Fees
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-feeamount">Fee Amount (PKR)</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                            <input type="number" id="edit-feeamount" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-feedate">Date of Fees Paid</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            <input type="date" id="edit-feedate" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-phone">Contact Number</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-phone"></i>
+                            <input type="tel" id="edit-phone" class="form-input">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancel-edit-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Student Fee Payment Modal -->
+    <div class="modal" id="collect-fee-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><span class="pkr-icon">PKR</span> Record Student Fee Payment</h3>
+                <button class="close-modal-btn" id="close-collect-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="collect-fee-form" class="form-stack">
+                    <div class="form-group">
+                        <label for="collect-student-select">Select Student <span class="required">*</span></label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-user"></i>
+                            <select id="collect-student-select" class="form-input" required>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="collect-month-select">Payment For Month <span class="required">*</span></label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <select id="collect-month-select" class="form-input" required>
+                                <!-- Populated dynamically (Jan 2026, Feb 2026, Mar 2026, etc.) -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Payment Type <span class="required">*</span></label>
+                        <div class="radio-toggle-group">
+                            <label class="radio-option">
+                                <input type="radio" name="collect-feetype" value="Monthly Fees"
+                                    id="collect-feetype-monthly" checked>
+                                <span class="radio-tile">
+                                    <i class="fa-solid fa-calendar-days"></i> Monthly Fees
+                                </span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="collect-feetype" value="Advance Fees"
+                                    id="collect-feetype-advance">
+                                <span class="radio-tile">
+                                    <i class="fa-solid fa-bolt"></i> Advance Fees
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="collect-fee-amount">Amount Received (PKR) <span class="required">*</span></label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                            <input type="number" id="collect-fee-amount" class="form-input" value="1000" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="collect-payment-date">Payment Date <span class="required">*</span></label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            <input type="date" id="collect-payment-date" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancel-collect-fee-btn">Cancel</button>
+                        <button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Save Fee
+                            Payment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student All-Months Fee Card Modal -->
+    <div class="modal" id="fee-card-modal">
+        <div class="modal-content" style="max-width: 680px;">
+            <div class="modal-header">
+                <h3><span class="pkr-icon">PKR</span> Student All-Months Fee Card</h3>
+                <button class="close-modal-btn" id="close-fee-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="fee-card-student-info" class="content-card mb-15 p-15"
+                    style="background-color: var(--bg-tertiary);">
+                    <!-- Populated dynamically -->
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Month & Year</th>
+                                <th>Fee Amount</th>
+                                <th>Status</th>
+                                <th>Paid Date</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fee-card-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast-notification">
+        <i class="toast-icon fa-solid fa-circle-check"></i>
+        <span class="toast-message" id="toast-message">Success notification</span>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+
+</html>
