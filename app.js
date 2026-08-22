@@ -697,7 +697,7 @@ function openEditModal(studentId) {
     document.getElementById('edit-name').value = student.name;
     document.getElementById('edit-fname').value = student.fname;
     document.getElementById('edit-class').value = student.class;
-    
+
     const feeTypeVal = student.feetype || 'Monthly Fees';
     if (feeTypeVal === 'Advance Fees') {
         const advRadio = document.getElementById('edit-feetype-advance');
@@ -1044,57 +1044,85 @@ function openStudentFeeCard(studentId) {
 // ==========================================
 // 9. Backup, Import & Cloud Sync
 // ==========================================
+let cloudSyncTimer = null;
+
 function initSyncBackup() {
     // Export JSON
-    document.getElementById('btn-export-json').addEventListener('click', () => {
-        const backupData = {
-            exportDate: new Date().toISOString(),
-            students: state.students,
-            attendanceLogs: state.attendanceLogs
-        };
-        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `academy_backup_${getTodayFormatted()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        showToast('Backup JSON downloaded successfully!');
-    });
+    const exportBtn = document.getElementById('btn-export-json');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            const backupData = {
+                exportDate: new Date().toISOString(),
+                students: state.students,
+                attendanceLogs: state.attendanceLogs
+            };
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `academy_backup_${getTodayFormatted()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Backup JSON downloaded successfully!');
+        });
+    }
 
     // Import JSON
-    document.getElementById('btn-import-json').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    const importInput = document.getElementById('btn-import-json');
+    if (importInput) {
+        importInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-            try {
-                const parsed = JSON.parse(evt.target.result);
-                if (parsed.students && Array.isArray(parsed.students)) {
-                    state.students = parsed.students;
-                    saveStudents();
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if (parsed.students && Array.isArray(parsed.students)) {
+                        state.students = parsed.students;
+                        saveStudents();
+                    }
+                    if (parsed.attendanceLogs && typeof parsed.attendanceLogs === 'object') {
+                        state.attendanceLogs = parsed.attendanceLogs;
+                        saveAttendance();
+                    }
+                    showToast('Data restored from JSON backup successfully!');
+                    populateCourseDropdowns();
+                    switchTab('dashboard');
+                } catch (err) {
+                    showToast('Invalid JSON file format', 'error');
                 }
-                if (parsed.attendanceLogs && typeof parsed.attendanceLogs === 'object') {
-                    state.attendanceLogs = parsed.attendanceLogs;
-                    saveAttendance();
-                }
-                showToast('Data restored from JSON backup successfully!');
-                populateCourseDropdowns();
-                switchTab('dashboard');
-            } catch (err) {
-                showToast('Invalid JSON file format', 'error');
-            }
-        };
-        reader.readAsText(file);
-    });
+            };
+            reader.readAsText(file);
+        });
+    }
 
-    // Cloud Sync Config Form
+    // Cloud Sync Modal & Config Form Setup
+    const syncIndicator = document.getElementById('sync-indicator');
+    const cloudModal = document.getElementById('cloud-sync-modal');
+    const closeCloudModalBtn = document.getElementById('close-cloud-modal-btn');
     const cloudSyncForm = document.getElementById('cloud-sync-form');
-    if (cloudSyncForm) {
-        document.getElementById('supabase-url').value = state.supabaseConfig.url || '';
-        document.getElementById('supabase-key').value = state.supabaseConfig.key || '';
+    const syncNowBtn = document.getElementById('btn-sync-now');
 
+    if (syncIndicator && cloudModal) {
+        syncIndicator.addEventListener('click', () => {
+            if (document.getElementById('supabase-url')) {
+                document.getElementById('supabase-url').value = state.supabaseConfig.url || '';
+            }
+            if (document.getElementById('supabase-key')) {
+                document.getElementById('supabase-key').value = state.supabaseConfig.key || '';
+            }
+            cloudModal.classList.add('active');
+        });
+    }
+
+    if (closeCloudModalBtn && cloudModal) {
+        closeCloudModalBtn.addEventListener('click', () => {
+            cloudModal.classList.remove('active');
+        });
+    }
+
+    if (cloudSyncForm) {
         cloudSyncForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const url = document.getElementById('supabase-url').value.trim();
@@ -1103,44 +1131,196 @@ function initSyncBackup() {
             state.supabaseConfig = { url, key };
             localStorage.setItem(STORAGE_KEYS.SUPABASE_CONFIG, JSON.stringify(state.supabaseConfig));
 
-            updateSyncIndicatorUI(!!url);
             showToast('Cloud database credentials saved!');
-            triggerCloudSync();
-        });
-
-        document.getElementById('btn-sync-now').addEventListener('click', () => {
+            if (cloudModal) cloudModal.classList.remove('active');
             triggerCloudSync(true);
         });
     }
 
-    updateSyncIndicatorUI(!!state.supabaseConfig.url);
+    if (syncNowBtn) {
+        syncNowBtn.addEventListener('click', () => {
+            triggerCloudSync(true);
+        });
+    }
+
+    // Initial Sync Status check & start periodic polling if configured
+    if (state.supabaseConfig.url && state.supabaseConfig.key) {
+        triggerCloudSync(false);
+    } else {
+        updateSyncIndicatorUI('offline');
+    }
+
+    if (!cloudSyncTimer) {
+        cloudSyncTimer = setInterval(() => {
+            if (state.supabaseConfig.url && state.supabaseConfig.key) {
+                triggerCloudSync(false);
+            }
+        }, 30000); // Background polling every 30 seconds
+    }
 }
 
-function updateSyncIndicatorUI(isCloudActive) {
+function updateSyncIndicatorUI(status, message) {
     const title = document.getElementById('sync-mode-title');
     const desc = document.getElementById('sync-mode-desc');
-    if (isCloudActive) {
+    const indicator = document.getElementById('sync-indicator');
+
+    if (!title || !desc) return;
+
+    if (status === 'online') {
         title.textContent = 'Supabase Cloud';
-        desc.textContent = 'Live Remote Sync Active';
+        desc.textContent = message || 'Live Remote Sync Active';
+        if (indicator) indicator.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+    } else if (status === 'error') {
+        title.textContent = 'Sync Warning';
+        desc.textContent = message || 'Cloud connection error';
+        if (indicator) indicator.style.borderColor = 'rgba(239, 68, 68, 0.4)';
     } else {
         title.textContent = 'Local Storage';
         desc.textContent = 'Click Cloud & Sync to connect';
+        if (indicator) indicator.style.borderColor = 'var(--border-color)';
     }
 }
 
 async function triggerCloudSync(manualAlert = false) {
-    if (!state.supabaseConfig.url || !state.supabaseConfig.key) {
+    const url = state.supabaseConfig.url ? state.supabaseConfig.url.replace(/\/+$/, '') : '';
+    const key = state.supabaseConfig.key || '';
+
+    if (!url || !key) {
+        updateSyncIndicatorUI('offline');
         if (manualAlert) showToast('Please enter Cloud API credentials first!', 'error');
         return;
     }
 
     try {
-        if (manualAlert) showToast('Syncing with Cloud Database...');
-        // Mock API payload post/fetch sync
-        updateSyncIndicatorUI(true);
-        if (manualAlert) showToast('Cloud sync complete!');
+        if (manualAlert) showToast('Syncing with Supabase Cloud...');
+
+        const headers = {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates'
+        };
+
+        // 1. Fetch remote data (PULL)
+        const fetchUrl = `${url}/rest/v1/academy_sync?select=*`;
+        const res = await fetch(fetchUrl, {
+            method: 'GET',
+            headers: {
+                'apikey': key,
+                'Authorization': `Bearer ${key}`
+            }
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`HTTP ${res.status}: ${errorText || res.statusText}`);
+        }
+
+        const remoteRows = await res.json();
+        let remoteStudents = null;
+        let remoteAttendance = null;
+
+        if (Array.isArray(remoteRows)) {
+            remoteRows.forEach(row => {
+                if (row.key === 'students' && row.value) {
+                    remoteStudents = row.value;
+                }
+                if (row.key === 'attendance' && row.value) {
+                    remoteAttendance = row.value;
+                }
+            });
+        }
+
+        let dataChanged = false;
+
+        // If remote data exists, merge remote records with local state
+        if (remoteStudents && Array.isArray(remoteStudents) && remoteStudents.length > 0) {
+            const localMap = new Map(state.students.map(s => [s.id, s]));
+
+            remoteStudents.forEach(remoteStudent => {
+                ensureStudentFeeHistory(remoteStudent);
+                if (!localMap.has(remoteStudent.id)) {
+                    state.students.push(remoteStudent);
+                    dataChanged = true;
+                } else {
+                    const localStudent = localMap.get(remoteStudent.id);
+                    const mergedFeeHistory = {
+                        ...(localStudent.feeHistory || {}),
+                        ...(remoteStudent.feeHistory || {})
+                    };
+                    const updatedStudent = {
+                        ...localStudent,
+                        ...remoteStudent,
+                        feeHistory: mergedFeeHistory
+                    };
+
+                    if (JSON.stringify(localStudent) !== JSON.stringify(updatedStudent)) {
+                        const idx = state.students.findIndex(s => s.id === remoteStudent.id);
+                        if (idx !== -1) {
+                            state.students[idx] = updatedStudent;
+                            dataChanged = true;
+                        }
+                    }
+                }
+            });
+
+            if (dataChanged) {
+                localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(state.students));
+            }
+        }
+
+        if (remoteAttendance && typeof remoteAttendance === 'object') {
+            const beforeStr = JSON.stringify(state.attendanceLogs);
+            state.attendanceLogs = {
+                ...state.attendanceLogs,
+                ...remoteAttendance
+            };
+            if (beforeStr !== JSON.stringify(state.attendanceLogs)) {
+                localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(state.attendanceLogs));
+                dataChanged = true;
+            }
+        }
+
+        // 2. Push merged local data to Supabase (PUSH)
+        const pushPayload = [
+            {
+                key: 'students',
+                value: state.students,
+                updated_at: new Date().toISOString()
+            },
+            {
+                key: 'attendance',
+                value: state.attendanceLogs,
+                updated_at: new Date().toISOString()
+            }
+        ];
+
+        const pushRes = await fetch(`${url}/rest/v1/academy_sync`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(pushPayload)
+        });
+
+        if (!pushRes.ok) {
+            const pushErr = await pushRes.text();
+            throw new Error(`Push failed (${pushRes.status}): ${pushErr}`);
+        }
+
+        updateSyncIndicatorUI('online', 'Live Remote Sync Active');
+
+        if (dataChanged) {
+            populateCourseDropdowns();
+            renderDashboard();
+            renderStudentsTable();
+            renderFeeTable();
+            renderAttendanceTable();
+        }
+
+        if (manualAlert) showToast('Cloud sync complete! Remote database updated.');
     } catch (err) {
-        if (manualAlert) showToast('Failed to sync with cloud database', 'error');
+        console.error('Supabase Cloud Sync Error:', err);
+        updateSyncIndicatorUI('error', 'Sync Failed - Check Settings');
+        if (manualAlert) showToast(`Sync Error: ${err.message}`, 'error');
     }
 }
 
