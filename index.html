@@ -60,7 +60,8 @@
             </nav>
 
             <div class="sidebar-footer">
-                <div class="sync-status-card" id="sync-indicator">
+                <div class="sync-status-card" id="sync-indicator" style="cursor: pointer;"
+                    title="Click to configure Cloud & Remote Sync">
                     <i class="fa-solid fa-hard-drive"></i>
                     <div class="sync-text">
                         <span class="sync-title" id="sync-mode-title">Local Storage</span>
@@ -734,6 +735,67 @@
                             <!-- Populated dynamically -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cloud Sync & Remote Database Settings Modal -->
+    <div class="modal" id="cloud-sync-modal">
+        <div class="modal-content" style="max-width: 620px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-cloud-arrow-up"></i> Cloud Database & Live Sync Settings</h3>
+                <button class="close-modal-btn" id="close-cloud-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-15">Connect your free <strong>Supabase</strong> database to share live updates
+                    real-time between your city device and village academy.</p>
+
+                <form id="cloud-sync-form" class="form-stack">
+                    <div class="form-group">
+                        <label for="supabase-url">Supabase Project URL <span class="required">*</span></label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-globe"></i>
+                            <input type="url" id="supabase-url" class="form-input"
+                                placeholder="https://your-project-id.supabase.co" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="supabase-key">Supabase Anon Key (Public) <span class="required">*</span></label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-key"></i>
+                            <input type="password" id="supabase-key" class="form-input"
+                                placeholder="eyJhbGciOiJIUzI1NiIsIn..." required>
+                        </div>
+                    </div>
+
+                    <div class="sync-actions-row flex-gap-10" style="margin-top: 10px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary" id="btn-save-cloud-config" style="flex: 1;">
+                            <i class="fa-solid fa-floppy-disk"></i> Save & Test Connection
+                        </button>
+                        <button type="button" class="btn btn-success" id="btn-sync-now" style="flex: 1;">
+                            <i class="fa-solid fa-rotate"></i> Sync Now
+                        </button>
+                    </div>
+                </form>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+                <div class="sql-setup-card p-15"
+                    style="background: var(--bg-tertiary); border-radius: var(--radius-md); padding: 15px;">
+                    <h4 style="font-size: 0.9rem; margin-bottom: 8px; color: var(--text-primary);"><i
+                            class="fa-solid fa-database"></i> 1-Step Supabase Setup (SQL Editor)</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;">Copy and run this
+                        query in your Supabase project's <strong>SQL Editor</strong> tab to create the sync table:</p>
+                    <pre
+                        style="background: var(--bg-primary); padding: 10px; border-radius: var(--radius-sm); font-size: 0.78rem; overflow-x: auto; color: var(--color-success); border: 1px solid var(--border-color); font-family: monospace;">CREATE TABLE IF NOT EXISTS academy_sync (
+  key TEXT PRIMARY KEY,
+  value JSONB NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE academy_sync ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public full access" ON academy_sync FOR ALL USING (true) WITH CHECK (true);</pre>
                 </div>
             </div>
         </div>
