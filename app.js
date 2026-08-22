@@ -1229,6 +1229,9 @@ async function triggerCloudSync(manualAlert = false) {
 
         if (!res.ok) {
             const errorText = await res.text();
+            if (res.status === 404 || errorText.includes('PGRST205') || errorText.includes('schema cache')) {
+                throw new Error("Table 'academy_sync' missing in Supabase! Please run the 1-Step SQL snippet in Supabase SQL Editor.");
+            }
             throw new Error(`HTTP ${res.status}: ${errorText || res.statusText}`);
         }
 
