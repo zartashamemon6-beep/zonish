@@ -300,6 +300,14 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="input-regdate">Date of Registration <span class="required">*</span></label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    <input type="date" id="input-regdate" class="form-input" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
                                 <label for="input-feedate">Date of Fees Paid <span class="required">*</span></label>
                                 <div class="input-icon-wrapper">
                                     <i class="fa-solid fa-calendar-check"></i>
@@ -349,6 +357,7 @@
                                         <th>Name</th>
                                         <th>Father's Name (F/Name)</th>
                                         <th>Class / Course</th>
+                                        <th>Registration Date</th>
                                         <th>Monthly Fees / Advance</th>
                                         <th>Date of Fees Paid</th>
                                         <th>Fee Status</th>
@@ -446,7 +455,7 @@
                                 <div class="input-icon-wrapper">
                                     <i class="fa-solid fa-key"></i>
                                     <input type="password" id="admin-password-input" class="form-input"
-                                        placeholder="Enter password (default: admin123)" required>
+                                        placeholder="Enter password (default: admin12345)" required>
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block">
@@ -458,78 +467,100 @@
 
                 <!-- Unlocked Content (Hidden until unlocked) -->
                 <div id="admin-unlocked-content" style="display: none;">
-                    <div class="dashboard-grid mb-20">
-                        <!-- Card 1: Admin Control Center -->
-                        <div class="content-card">
-                            <div class="card-header">
-                                <h3><i class="fa-solid fa-user-shield"></i> Admin Control Center</h3>
-                                <button class="btn btn-secondary btn-xs" id="btn-lock-admin">
-                                    <i class="fa-solid fa-lock"></i> Lock Panel
-                                </button>
+                    <!-- Admin Financial Header & Quick Actions -->
+                    <div class="content-card mb-20">
+                        <div class="card-header flex-wrap gap-15">
+                            <div>
+                                <h3 style="font-size: 1.25rem;"><i class="fa-solid fa-vault"
+                                        style="color: var(--color-success);"></i> Admin Financial Ledger & Revenue
+                                    Portal</h3>
+                                <p class="text-muted" style="font-size: 0.85rem; margin-top: 4px;">Exclusive financial
+                                    overview of all student payments and monthly earnings for <strong>ZONISH COMPUTER
+                                        ACADEMY NEWJAOTI</strong>.</p>
                             </div>
-                            <div class="card-body">
-                                <p class="text-muted mb-15">Academy controls for <strong>ZONISH COMPUTER ACADEMY
-                                        NEWJAOTI</strong>.</p>
-                                <div class="form-stack">
-                                    <div class="form-group">
-                                        <label>Academy Name</label>
-                                        <input type="text" class="form-input" value="ZONISH - Computer Academy Newjatoi"
-                                            readonly style="opacity:0.8;">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Database Status</label>
-                                        <p class="text-muted"><strong id="admin-student-count">0</strong> Enrolled
-                                            Students in system.</p>
-                                    </div>
-                                    <hr style="border:0; border-top: 1px solid var(--border-color);">
-                                    <div class="form-group">
-                                        <label for="change-admin-pass">Update Admin Password</label>
-                                        <div class="flex-gap-10">
-                                            <input type="password" id="change-admin-pass" class="form-input"
-                                                placeholder="New password...">
-                                            <button type="button" class="btn btn-primary btn-sm"
-                                                id="btn-save-new-pass">Save</button>
-                                        </div>
+                            <button class="btn btn-secondary btn-sm" id="btn-lock-admin">
+                                <i class="fa-solid fa-lock"></i> Lock Panel
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <!-- Stats Grid for Financial Overview -->
+                            <div class="stats-grid" style="margin-bottom: 0;">
+                                <div class="stat-card gradient-green">
+                                    <div class="stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                                    <div class="stat-details">
+                                        <span class="stat-label">Total All-Time Revenue</span>
+                                        <h2 class="stat-value" id="admin-total-revenue">Rs. 0</h2>
+                                        <span class="stat-meta text-success">Cumulative Income Collected</span>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <!-- Card 2: Danger Zone -->
-                        <div class="content-card" style="border: 1px solid rgba(239, 68, 68, 0.4);">
-                            <div class="card-header" style="background-color: rgba(239, 68, 68, 0.08);">
-                                <h3 style="color: var(--color-danger);"><i class="fa-solid fa-triangle-exclamation"></i>
-                                    Danger Zone</h3>
-                                <span class="badge badge-danger">Admin Action</span>
-                            </div>
-                            <div class="card-body">
-                                <p class="text-muted mb-15">Wipe student database or restore initial demo records.</p>
-                                <div class="form-stack">
-                                    <div class="form-group">
-                                        <label for="confirm-delete-text">To delete all students, type
-                                            <strong>DELETE</strong> below:</label>
-                                        <input type="text" id="confirm-delete-text" class="form-input"
-                                            placeholder="Type DELETE here...">
+                                <div class="stat-card gradient-blue">
+                                    <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                                    <div class="stat-details">
+                                        <span class="stat-label">This Month's Income</span>
+                                        <h2 class="stat-value" id="admin-current-month-revenue">Rs. 0</h2>
+                                        <span class="stat-meta" id="admin-current-month-label">Current Month</span>
                                     </div>
-                                    <button class="btn btn-block" id="btn-delete-all-students"
-                                        style="background-color: var(--color-danger); color: white;" disabled>
-                                        <i class="fa-solid fa-trash-can"></i> Delete All Students Database
-                                    </button>
-                                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
-                                    <button class="btn btn-outline btn-block" id="btn-reset-demo-data">
-                                        <i class="fa-solid fa-rotate-left"></i> Restore Sample Demo Students
-                                    </button>
+                                </div>
+
+                                <div class="stat-card gradient-purple">
+                                    <div class="stat-icon"><i class="fa-solid fa-user-graduate"></i></div>
+                                    <div class="stat-details">
+                                        <span class="stat-label">Enrolled Students</span>
+                                        <h2 class="stat-value" id="admin-student-count">0</h2>
+                                        <span class="stat-meta" id="admin-active-paying-count">0 Active Payers</span>
+                                    </div>
+                                </div>
+
+                                <div class="stat-card gradient-amber">
+                                    <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+                                    <div class="stat-details">
+                                        <span class="stat-label">Overall Collection Rate</span>
+                                        <h2 class="stat-value" id="admin-overall-collection-rate">0%</h2>
+                                        <span class="stat-meta text-warning">Paid Ratio</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Card 3 (New Card): Month-Wise Payment Summary & Total Students Ledger -->
-                    <div class="content-card">
+                    <!-- Table 1: Individual Student Payment Breakdown ("How much each student is paying") -->
+                    <div class="content-card mb-20">
+                        <div class="card-header flex-wrap gap-15">
+                            <h3><span class="pkr-icon">PKR</span> Student Payment Ledger (How Much Each Student Is
+                                Paying)</h3>
+                            <div class="search-box" style="max-width: 320px;">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="admin-student-search" class="form-input form-input-sm"
+                                    placeholder="Search student name or course...">
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student ID & Name</th>
+                                            <th>Father's Name (F/Name)</th>
+                                            <th>Class / Course</th>
+                                            <th>Monthly Fee (PKR)</th>
+                                            <th>Total Fees Paid</th>
+                                            <th>Current Month Status</th>
+                                            <th class="text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-students-payment-body">
+                                        <!-- Populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table 2: Month-Wise Income Summary -->
+                    <div class="content-card mb-20">
                         <div class="card-header">
-                            <h3><span class="pkr-icon">PKR</span> All Months Payment Collection & Student
-                                Summary
-                            </h3>
+                            <h3><i class="fa-solid fa-calendar-days"></i> Monthly Income & Revenue Breakdown</h3>
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
@@ -544,9 +575,59 @@
                                         </tr>
                                     </thead>
                                     <tbody id="admin-monthly-summary-body">
-                                        <!-- Populated dynamically (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug...) -->
+                                        <!-- Populated dynamically -->
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Settings & Danger Zone Controls -->
+                    <div class="dashboard-grid">
+                        <!-- Security & Password -->
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-shield-halved"></i> Admin Security Settings</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-stack">
+                                    <div class="form-group">
+                                        <label for="change-admin-pass">Update Admin Password</label>
+                                        <div class="flex-gap-10" style="display:flex; gap:10px;">
+                                            <input type="password" id="change-admin-pass" class="form-input"
+                                                placeholder="Enter new password...">
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                id="btn-save-new-pass">Save Password</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Danger Zone -->
+                        <div class="content-card" style="border: 1px solid rgba(239, 68, 68, 0.4);">
+                            <div class="card-header" style="background-color: rgba(239, 68, 68, 0.08);">
+                                <h3 style="color: var(--color-danger);"><i class="fa-solid fa-triangle-exclamation"></i>
+                                    Danger Zone</h3>
+                                <span class="badge badge-danger">Admin Action</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-stack">
+                                    <div class="form-group">
+                                        <label for="confirm-delete-text">Type <strong>DELETE</strong> to reset
+                                            database:</label>
+                                        <input type="text" id="confirm-delete-text" class="form-input"
+                                            placeholder="Type DELETE here...">
+                                    </div>
+                                    <button class="btn btn-block" id="btn-delete-all-students"
+                                        style="background-color: var(--color-danger); color: white;" disabled>
+                                        <i class="fa-solid fa-trash-can"></i> Delete All Students Database
+                                    </button>
+                                    <button class="btn btn-outline btn-block" id="btn-reset-demo-data"
+                                        style="margin-top: 8px;">
+                                        <i class="fa-solid fa-rotate-left"></i> Restore Sample Demo Students
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -608,6 +689,13 @@
                         <div class="input-icon-wrapper">
                             <i class="fa-solid fa-money-bill-wave"></i>
                             <input type="number" id="edit-feeamount" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-regdate">Date of Registration</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <input type="date" id="edit-regdate" class="form-input" required>
                         </div>
                     </div>
                     <div class="form-group">
